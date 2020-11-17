@@ -25,7 +25,7 @@ struct ClimaRequest {
 
     init(zipCode: String) {
         
-        let resouceStringClima = "http://api.openweathermap.org/data/2.5/weather?zip=\(zipCode),ar&lang=es&appid=\(apiKey)"
+        let resouceStringClima = "http://api.openweathermap.org/data/2.5/weather?zip=\(zipCode),ar&units=metric&lang=es&appid=\(apiKey)"
         guard let resourceClima =  URL(string: resouceStringClima) else {fatalError()}
         self.resourceClima = resourceClima
     
