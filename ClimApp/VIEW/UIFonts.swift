@@ -18,8 +18,12 @@ extension UIFont {
         return UIFont.systemFont(ofSize: 11, weight: .regular)
     }
     
-    class var temperaturaFont: UIFont {
+    class var tagFont: UIFont {
         return UIFont.systemFont(ofSize: 34, weight: .bold)
+    }
+    
+    class var bodyFont: UIFont {
+        return UIFont.systemFont(ofSize: 11, weight: .regular)
     }
     
 }

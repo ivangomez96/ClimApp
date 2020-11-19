@@ -16,6 +16,9 @@
 		08562F272563098200A47149 /* ClimAppTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08562F262563098200A47149 /* ClimAppTests.swift */; };
 		08562F332563289B00A47149 /* Clima.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08562F322563289B00A47149 /* Clima.swift */; };
 		08562F35256328C400A47149 /* ClimaRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08562F34256328C400A47149 /* ClimaRequest.swift */; };
+		08562F392564036900A47149 /* UIColor+Aditions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08562F382564036900A47149 /* UIColor+Aditions.swift */; };
+		08562F3B256434DF00A47149 /* UIFonts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08562F3A256434DF00A47149 /* UIFonts.swift */; };
+		08562F3F25644B3C00A47149 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 08562F3E25644B3C00A47149 /* README.md */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -42,6 +45,9 @@
 		08562F282563098200A47149 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		08562F322563289B00A47149 /* Clima.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Clima.swift; sourceTree = "<group>"; };
 		08562F34256328C400A47149 /* ClimaRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimaRequest.swift; sourceTree = "<group>"; };
+		08562F382564036900A47149 /* UIColor+Aditions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIColor+Aditions.swift"; sourceTree = "<group>"; };
+		08562F3A256434DF00A47149 /* UIFonts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIFonts.swift; sourceTree = "<group>"; };
+		08562F3E25644B3C00A47149 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -83,6 +89,7 @@
 		08562F0E2563097700A47149 /* ClimApp */ = {
 			isa = PBXGroup;
 			children = (
+				08562F3E25644B3C00A47149 /* README.md */,
 				08562F0F2563097700A47149 /* AppDelegate.swift */,
 				08562F112563097700A47149 /* SceneDelegate.swift */,
 				08562F152563097700A47149 /* Main.storyboard */,
@@ -125,6 +132,8 @@
 		08562F3725632E7F00A47149 /* VIEW */ = {
 			isa = PBXGroup;
 			children = (
+				08562F382564036900A47149 /* UIColor+Aditions.swift */,
+				08562F3A256434DF00A47149 /* UIFonts.swift */,
 			);
 			path = VIEW;
 			sourceTree = "<group>";
@@ -212,6 +221,7 @@
 			files = (
 				08562F1C2563098100A47149 /* LaunchScreen.storyboard in Resources */,
 				08562F192563098100A47149 /* Assets.xcassets in Resources */,
+				08562F3F25644B3C00A47149 /* README.md in Resources */,
 				08562F172563097700A47149 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -232,7 +242,9 @@
 			files = (
 				08562F332563289B00A47149 /* Clima.swift in Sources */,
 				08562F142563097700A47149 /* MainVC.swift in Sources */,
+				08562F392564036900A47149 /* UIColor+Aditions.swift in Sources */,
 				08562F35256328C400A47149 /* ClimaRequest.swift in Sources */,
+				08562F3B256434DF00A47149 /* UIFonts.swift in Sources */,
 				08562F102563097700A47149 /* AppDelegate.swift in Sources */,
 				08562F122563097700A47149 /* SceneDelegate.swift in Sources */,
 			);
