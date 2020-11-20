@@ -14,7 +14,7 @@ extension UIFont {
         return UIFont.systemFont(ofSize: 17, weight: .semibold)
     }
     
-    class var captionFont: UIFont {
+    class var bodyFont: UIFont {
         return UIFont.systemFont(ofSize: 11, weight: .regular)
     }
     
@@ -22,8 +22,8 @@ extension UIFont {
         return UIFont.systemFont(ofSize: 34, weight: .bold)
     }
     
-    class var bodyFont: UIFont {
-        return UIFont.systemFont(ofSize: 11, weight: .regular)
+    class var bodyBoldFont: UIFont {
+        return UIFont.systemFont(ofSize: 11, weight: .bold)
     }
     
 }

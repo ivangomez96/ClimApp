@@ -65,5 +65,9 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>ClimApp necesita saber tu ubicación para mostrarte el clima precisamente.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>ClimApp necesita saber tu ubicación para mostrarte el clima precisamente.</string>
 </dict>
 </plist>

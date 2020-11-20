@@ -7,11 +7,18 @@
 //
 
 import UIKit
+import CoreLocation
 
 class MainVC: UIViewController {
     
     // MARK: - VARIABLES
 
+    let timestampAhora = NSDate().timeIntervalSince1970
+    
+    var locationManager = CLLocationManager()
+    var currentLocation: CLLocation?
+    var latitudActual: Double?
+    var longitudActual: Double?
 
     // MARK: - UI
     
@@ -30,7 +37,7 @@ class MainVC: UIViewController {
         label.text = ""
         label.textAlignment = .right
         label.textColor = .naranja3
-        label.font = UIFont.captionFont
+        label.font = UIFont.bodyFont
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -47,7 +54,7 @@ class MainVC: UIViewController {
         let label = UILabel()
         label.text = ""
         label.textColor = .naranja2
-        label.font = UIFont.captionFont
+        label.font = UIFont.bodyFont
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -65,7 +72,7 @@ class MainVC: UIViewController {
         let label = UILabel()
         label.text = ""
         label.textColor = .naranja2
-        label.font = UIFont.captionFont
+        label.font = UIFont.bodyFont
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -109,7 +116,7 @@ class MainVC: UIViewController {
         let label = UILabel()
         label.text = ""
         label.textColor = .naranja1
-        label.font = UIFont.captionFont
+        label.font = UIFont.bodyBoldFont
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -119,7 +126,7 @@ class MainVC: UIViewController {
         let label = UILabel()
         label.text = ""
         label.textColor = .naranja1
-        label.font = UIFont.captionFont
+        label.font = UIFont.bodyFont
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -137,7 +144,7 @@ class MainVC: UIViewController {
         let label = UILabel()
         label.text = ""
         label.textColor = .naranja1
-        label.font = UIFont.captionFont
+        label.font = UIFont.bodyBoldFont
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -147,7 +154,7 @@ class MainVC: UIViewController {
         let label = UILabel()
         label.text = ""
         label.textColor = .naranja1
-        label.font = UIFont.captionFont
+        label.font = UIFont.bodyFont
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -165,7 +172,7 @@ class MainVC: UIViewController {
         let label = UILabel()
         label.text = ""
         label.textColor = .naranja1
-        label.font = UIFont.captionFont
+        label.font = UIFont.bodyBoldFont
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -175,8 +182,17 @@ class MainVC: UIViewController {
         let label = UILabel()
         label.text = ""
         label.textColor = .naranja1
-        label.font = UIFont.captionFont
+        label.font = UIFont.bodyFont
         label.textAlignment = .center
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    private let headerSemanaLabel : UILabel = {
+        let label = UILabel()
+        label.text = "Semana"
+        label.textColor = .naranja1
+        label.font = UIFont.headerFont
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -188,11 +204,11 @@ class MainVC: UIViewController {
         super.viewDidLoad()
         
         view.backgroundColor = .naranja7
-        requestInicial()
+        
         requestHourly()
         
         //addsubviews
-    // ahora
+        // ahora
         view.addSubview(headerAhoraLabel)
         view.addSubview(headerSubtituloLabel)
         view.addSubview(ahoraView)
@@ -216,58 +232,55 @@ class MainVC: UIViewController {
         doceHsView.addSubview(doceHsTemperaturaLabel)
 
         view.addSubview(stackHsView)
+    // semana
+        view.addSubview(headerSemanaLabel)
+
+        
 
     }
     
     override func viewDidLayoutSubviews() {
         
         agregarConstraints()
-        
+
     }
     
     // MARK: - FUNC
-    
-    private func requestInicial(){
-//        let request = ClimaRequest()
-//        request.getClima(){ result in
-//
-//            switch result {
-//            case .failure(let error):
-//                print(error)
-//
-//            case .success(let clima):
-//                DispatchQueue.main.async {
-//
-//                }
-//
-//            }
-//
-//        }
-    }
-    
-    
+        
     
     private func requestHourly(){
-        let request = ClimaRequest(hora: 1605733200)
+        
+        locationManager.requestWhenInUseAuthorization()
+        if CLLocationManager.locationServicesEnabled() {
+            locationManager.delegate = self
+            locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
+            locationManager.startUpdatingLocation()
+            latitudActual = locationManager.location?.coordinate.latitude
+            longitudActual = locationManager.location?.coordinate.longitude
+        }
+        
+        let request = ClimaRequest(hora: Int(timestampAhora), latitud: latitudActual!, longitud: longitudActual!)
         request.getClimaHourly(){ result in
-            
+            print(self.latitudActual!)
+            print(self.longitudActual!)
+
             switch result {
             case .failure(let error):
                 print(error)
                 
             case .success(let clima):
                 DispatchQueue.main.async {
-                    
+
+
                     //ahora
                     self.temperaturaLabel.text =  "\(String(format: "%.0f", clima.current.temp))°"
                     self.sensacionLabel.text =  "/ ST \(String(format: "%.0f", clima.current.feelsLike))°"
-                    self.descripcionLabel.text = (clima.current.weather.first?.weatherDescription).map { $0.rawValue }?.uppercased()
+                    self.descripcionLabel.text = "\(clima.current.weather.first!.weatherDescription.rawValue.uppercased())"
                     self.humedadLabel.text = "Humedad: \(String(describing: clima.current.humidity))%"
                     
                     //despues
                     
                     let calculoHsSiguientes = self.calcularHsSiguientes(horaActual: Double(clima.current.dt))
-
                     self.cuatroHsLabel.text = "\(String(describing: calculoHsSiguientes[0])) hs."
                     self.ochoHsLabel.text = "\(String(describing: calculoHsSiguientes[1])) hs."
                     self.doceHsLabel.text = "\(String(describing: calculoHsSiguientes[2])) hs."
@@ -296,7 +309,7 @@ class MainVC: UIViewController {
         let dateEnDoceHs = Date(timeIntervalSince1970: horaEnDoceHs)
 
         var calendar = Calendar.current
-        calendar.timeZone = TimeZone(identifier: "UTC")!
+        calendar.timeZone = TimeZone(identifier: "GMT-3")!
         
         let hourCuatro = calendar.component(.hour, from: dateEnCuatroHs)
         let hourOcho = calendar.component(.hour, from: dateEnOchoHs)
@@ -372,10 +385,24 @@ class MainVC: UIViewController {
         doceHsTemperaturaLabel.bottomAnchor.constraint(equalTo: doceHsView.bottomAnchor, constant: -16).isActive = true
         doceHsTemperaturaLabel.centerXAnchor.constraint(equalTo: doceHsView.centerXAnchor).isActive = true
 
+        // semana
         
+        headerSemanaLabel.topAnchor.constraint(equalTo: stackHsView.bottomAnchor, constant: 24).isActive = true
+        headerSemanaLabel.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 24).isActive = true
+        headerSemanaLabel.rightAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
         
     }
     
+    
+    
+}
+
+// MARK: - EXTENSION
+
+extension MainVC: CLLocationManagerDelegate {
+    
+    
+
     
     
 }

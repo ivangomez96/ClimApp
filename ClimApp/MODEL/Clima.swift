@@ -72,9 +72,7 @@ enum Icon: String, Codable {
     case the01D = "01d"
     case the01N = "01n"
     case the02D = "02d"
-    case the03D = "03d"
-    case the04D = "04d"
-    case the04N = "04n"
+    case the02N = "02n"
     case the10D = "10d"
 }
 
@@ -87,11 +85,9 @@ enum Main: String, Codable {
 enum Description: String, Codable {
     case algoDeNubes = "algo de nubes"
     case cieloClaro = "cielo claro"
+    case lluviaDeGranIntensidad = "lluvia de gran intensidad"
     case lluviaLigera = "lluvia ligera"
     case lluviaModerada = "lluvia moderada"
-    case muyNuboso = "muy nuboso"
-    case nubes = "nubes"
-    case nubesDispersas = "nubes dispersas"
 }
 
 // MARK: - Daily
