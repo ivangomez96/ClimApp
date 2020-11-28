@@ -19,7 +19,12 @@ class MainTableVC: UITableViewController, CLLocationManagerDelegate {
     var currentLocation: CLLocation?
     var latitudActual: Double?
     var longitudActual: Double?
-        
+    var ubicacion: String? {
+        didSet{
+            tableView.reloadData()
+        }
+    }
+    
     var climaActual: ClimaResponse? {
         didSet {
             DispatchQueue.main.async {
@@ -27,21 +32,6 @@ class MainTableVC: UITableViewController, CLLocationManagerDelegate {
             }
         }
     }
-
-    // MARK: - UI
-
-    
-    private let headerSubtituloLabel : UILabel = {
-        let label = UILabel()
-        label.text = ""
-        label.textAlignment = .right
-        label.textColor = .naranja3
-        label.font = UIFont.bodyFont
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-    
-
     
     // MARK: - LIFE CYCLES
     
@@ -87,7 +77,7 @@ class MainTableVC: UITableViewController, CLLocationManagerDelegate {
                 longitudActual = locationManager.location?.coordinate.longitude
                 fetchCityAndCountry(from: locationManager.location!) { city, country, error in
                     guard let city = city, let country = country, error == nil else { return }
-                    self.headerSubtituloLabel.text = "\(city), \(country)"
+                    self.ubicacion = "\(city), \(country)"
                 }
             }
         }
@@ -160,6 +150,28 @@ class MainTableVC: UITableViewController, CLLocationManagerDelegate {
         return [hourCuatro, hourOcho, hourDoce]
     }
     
+    private func calcularDiasSiguientes(horaActual: Double) -> [Date] {
+        
+        let mañana = horaActual + 86400
+        let pasadoMañana = horaActual + 172800
+        let diaEnTresDias = horaActual + 259200
+        let diaEnCuatroDias = horaActual + 345600
+        let diaEnCincoDias = horaActual + 432000
+        let diaEnSeisDias = horaActual + 518400
+        let diaEnSieteDias = horaActual + 604800
+
+        let dateMañana = Date(timeIntervalSince1970: mañana)
+        let datePasadoMañana = Date(timeIntervalSince1970: pasadoMañana)
+        let dateEnTresDias = Date(timeIntervalSince1970: diaEnTresDias)
+        let dateEnCuatroDias = Date(timeIntervalSince1970: diaEnCuatroDias)
+        let dateEnCincoDias = Date(timeIntervalSince1970: diaEnCincoDias)
+        let dateEnSeisDias = Date(timeIntervalSince1970: diaEnSeisDias)
+        let dateEnSieteDias = Date(timeIntervalSince1970: diaEnSieteDias)
+
+        
+        return [dateMañana, datePasadoMañana, dateEnTresDias, dateEnCuatroDias, dateEnCincoDias, dateEnSeisDias, dateEnSieteDias]
+    }
+    
     
     private func agregarConstraints(){
         
@@ -182,14 +194,28 @@ class MainTableVC: UITableViewController, CLLocationManagerDelegate {
                                                 width: headerView.bounds.size.width,
                                                 height: 12))
         
+        let headerCiudadLabel = UILabel(frame: .zero)
+        headerCiudadLabel.textAlignment = .right
+        headerCiudadLabel.textColor = .naranja3
+        headerCiudadLabel.font = UIFont.bodyFont
+        headerCiudadLabel.text = ubicacion
+        headerCiudadLabel.backgroundColor = .red
+        
         headerLabel.text = self.tableView(self.tableView, titleForHeaderInSection: section)
         headerLabel.textAlignment = .left
         headerLabel.textColor = .naranja1
         headerLabel.font = UIFont.headerFont
         headerView.addSubview(headerLabel)
-        
-        return headerView
-        
+            
+        switch section {
+        case 0:
+            headerView.addSubview(headerCiudadLabel)
+            return headerView
+        default:
+            return headerView
+            
+        }
+                
     }
     
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String?{
@@ -268,16 +294,32 @@ class MainTableVC: UITableViewController, CLLocationManagerDelegate {
                 
                 let calculoHsSiguientes = self.calcularHsSiguientes(horaActual: Double(climaActual!.current.dt))
                 despuesCell.setupDespuesCell(cuatroHs: "\(String(describing: calculoHsSiguientes[0])) hs.",
-                                            cuatroHsTemperatura: "\(String(format: "%.0f", climaActual!.hourly[3].temp))°",
-                                             ochoHs:  "\(String(describing: calculoHsSiguientes[1])) hs.",
-                                            ochoHsTemperatura: "\(String(format: "%.0f", climaActual!.hourly[7].temp))°",
-                                             doceHs:  "\(String(describing: calculoHsSiguientes[2])) hs.",
-                                            doceHsTemperatura: "\(String(format: "%.0f", climaActual!.hourly[11].temp))°")
+                    cuatroHsTemperatura: "\(String(format: "%.0f", climaActual!.hourly[3].temp))°",
+                    ochoHs:  "\(String(describing: calculoHsSiguientes[1])) hs.",
+                    ochoHsTemperatura: "\(String(format: "%.0f", climaActual!.hourly[7].temp))°",
+                    doceHs:  "\(String(describing: calculoHsSiguientes[2])) hs.",
+                    doceHsTemperatura: "\(String(format: "%.0f", climaActual!.hourly[11].temp))°")
             }
             return despuesCell
             
         case 2:
             let semanaCell = tableView.dequeueReusableCell(withIdentifier: "SemanaCell", for: indexPath) as! SemanaCell
+            if climaActual != nil {
+                let calculoDiasSiguientes = self.calcularDiasSiguientes(horaActual: Double(climaActual!.current.dt))
+                
+                let dateFormatter = DateFormatter()
+                dateFormatter.dateFormat = "cccc"
+                dateFormatter.locale = Locale(identifier: "es_AR")
+                let diaNombre = dateFormatter.string(from: calculoDiasSiguientes[indexPath.row])
+                var calendar = Calendar.current
+                calendar.timeZone = TimeZone(identifier: "GMT-3")!
+                let diaNumero = calendar.component(.day, from: calculoDiasSiguientes[indexPath.row])
+
+
+                semanaCell.setupSemanaCell(dia: "\(diaNombre.capitalized) \(diaNumero)", temperatura: "\(String(format: "%.0f", climaActual!.hourly[3].temp))°")
+
+                
+            }
             return semanaCell
             
         default:
