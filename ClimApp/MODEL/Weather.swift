@@ -9,20 +9,14 @@
 import Foundation
 
 // MARK: - ClimaResponse
-struct ClimaResponse: Codable {
+struct WeatherResponse: Codable {
     let hourly: [Current]
     let current: Current
-    let timezoneOffset: Int
     let daily: [Daily]
-    let lon: Double
-    let timezone: String
-    let minutely: [Minutely]
-    let lat: Double
 
     enum CodingKeys: String, CodingKey {
         case hourly, current
-        case timezoneOffset = "timezone_offset"
-        case daily, lon, timezone, minutely, lat
+        case daily
     }
 }
 
@@ -32,26 +26,27 @@ struct Current: Codable {
     let temp: Double
     let humidity: Int
     let sunrise, sunset: Int?
-    let uvi: Double?
-    let windDeg: Int
     let weather: [Weather]
     let feelsLike: Double
-    let clouds, visibility: Int
-    let windSpeed: Double
-    let pressure: Int
-    let dewPoint: Double
-    let pop: Int?
+    let clouds: Int
+    let pop: Double?
+    let rain: Rain?
 
     enum CodingKeys: String, CodingKey {
-        case dt, temp, humidity, sunrise, sunset, uvi
-        case windDeg = "wind_deg"
+        case dt, temp, humidity, sunrise, sunset
         case weather
         case feelsLike = "feels_like"
-        case clouds, visibility
-        case windSpeed = "wind_speed"
-        case pressure
-        case dewPoint = "dew_point"
-        case pop
+        case clouds
+        case pop, rain
+    }
+}
+
+// MARK: - Rain
+struct Rain: Codable {
+    let the1H: Double
+
+    enum CodingKeys: String, CodingKey {
+        case the1H = "1h"
     }
 }
 
@@ -59,21 +54,13 @@ struct Current: Codable {
 struct Weather: Codable {
     let id: Int
     let main: Main
-    let icon: Icon
+    let icon: String
     let weatherDescription: Description
 
     enum CodingKeys: String, CodingKey {
         case id, main, icon
         case weatherDescription = "description"
     }
-}
-
-enum Icon: String, Codable {
-    case the01D = "01d"
-    case the01N = "01n"
-    case the02D = "02d"
-    case the02N = "02n"
-    case the10D = "10d"
 }
 
 enum Main: String, Codable {
@@ -85,9 +72,11 @@ enum Main: String, Codable {
 enum Description: String, Codable {
     case algoDeNubes = "algo de nubes"
     case cieloClaro = "cielo claro"
-    case lluviaDeGranIntensidad = "lluvia de gran intensidad"
     case lluviaLigera = "lluvia ligera"
     case lluviaModerada = "lluvia moderada"
+    case muyNuboso = "muy nuboso"
+    case nubes = "nubes"
+    case nubesDispersas = "nubes dispersas"
 }
 
 // MARK: - Daily
@@ -129,7 +118,3 @@ struct Temp: Codable {
     let max, morn: Double
 }
 
-// MARK: - Minutely
-struct Minutely: Codable {
-    let dt, precipitation: Int
-}

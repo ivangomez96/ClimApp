@@ -1,5 +1,5 @@
 //
-//  ClimaRequest.swift
+//  WeatherRequest.swift
 //  ClimApp
 //
 //  Created by Ivan on 16/11/2020.
@@ -8,12 +8,12 @@
 
 import Foundation
 
-enum ClimaError: Error {
+enum WeatherError: Error {
     case invalidApiKey
     case resourceNotFound
 }
 
-struct ClimaRequest {
+struct WeatherRequest {
     
     let apiKey = "7b5c558c5069b6efb1710c5888a0a2ad"
     
@@ -37,7 +37,7 @@ struct ClimaRequest {
     // MARK: - func
     
     
-    func getClimaHourly(completion: @escaping (Result<ClimaResponse, ClimaError>) -> Void )  {
+    func getClimaHourly(completion: @escaping (Result<WeatherResponse, WeatherError>) -> Void )  {
         let dataTask = URLSession.shared.dataTask(with: resourceClimaHourly!) { data, _, _ in
             guard let jsonData = data else {
                 completion(.failure(.resourceNotFound))
@@ -46,7 +46,7 @@ struct ClimaRequest {
 
             do {
                 let decoder = JSONDecoder()
-                let climaResponse = try decoder.decode(ClimaResponse.self, from: jsonData)
+                let climaResponse = try decoder.decode(WeatherResponse.self, from: jsonData)
                 
                 completion(.success(climaResponse))
             } catch {
