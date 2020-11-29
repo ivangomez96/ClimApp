@@ -1,5 +1,5 @@
 //
-//  ViewController.swift
+//  MainTableVC.swift
 //  ClimApp
 //
 //  Created by Ivan on 16/11/2020.
@@ -19,13 +19,9 @@ class MainTableVC: UITableViewController, CLLocationManagerDelegate {
     var currentLocation: CLLocation?
     var latitudActual: Double?
     var longitudActual: Double?
-    var ubicacion: String? {
-        didSet{
-            tableView.reloadData()
-        }
-    }
+    var ubicacion: String?
     
-    var climaActual: ClimaResponse? {
+    var climaActual: WeatherResponse? {
         didSet {
             DispatchQueue.main.async {
                 self.tableView.reloadData()
@@ -37,12 +33,10 @@ class MainTableVC: UITableViewController, CLLocationManagerDelegate {
     
     override init(style: UITableView.Style) {
         super.init(style: .grouped)
-        
     }
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-
     }
     
     override func viewDidLoad() {
@@ -54,18 +48,20 @@ class MainTableVC: UITableViewController, CLLocationManagerDelegate {
         tableView.register(SemanaCell.self, forCellReuseIdentifier: "SemanaCell")
         tableView.showsVerticalScrollIndicator = false
         
-        requestLocation()
-        requestHourly()
+        initialRequest()
         
     }
     
-    override func viewDidLayoutSubviews() {
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        initialRequest()
         
     }
     
     // MARK: - FUNC
     
-    private func requestLocation(){
+    private func initialRequest(){
         
         locationManager.requestWhenInUseAuthorization()
         if CLLocationManager.locationServicesEnabled() {
@@ -79,6 +75,7 @@ class MainTableVC: UITableViewController, CLLocationManagerDelegate {
                     guard let city = city, let country = country, error == nil else { return }
                     self.ubicacion = "\(city), \(country)"
                 }
+                hourlyWeatherRequest()
             }
         }
         
@@ -91,15 +88,13 @@ class MainTableVC: UITableViewController, CLLocationManagerDelegate {
                        error)
         }
     }
-        
+        		
     
-    private func requestHourly(){
+    private func hourlyWeatherRequest(){
     
         
-        let request = ClimaRequest(hora: Int(timestampAhora), latitud: latitudActual!, longitud: longitudActual!)
+        let request = WeatherRequest(hora: Int(timestampAhora), latitud: latitudActual!, longitud: longitudActual!)
         request.getClimaHourly(){ result in
-            print(self.latitudActual!)
-            print(self.longitudActual!)
 
             switch result {
             case .failure(let error):
@@ -191,15 +186,18 @@ class MainTableVC: UITableViewController, CLLocationManagerDelegate {
         
         let headerLabel = UILabel(frame: CGRect(x: 24,
                                                 y: 24,
-                                                width: headerView.bounds.size.width,
+                                                width: headerView.bounds.size.width - 48,
                                                 height: 12))
         
-        let headerCiudadLabel = UILabel(frame: .zero)
+        let headerCiudadLabel = UILabel(frame: CGRect(x: 24,
+                                                y: 24,
+                                                width: headerView.bounds.size.width - 48,
+                                                height: 12))
+        
         headerCiudadLabel.textAlignment = .right
         headerCiudadLabel.textColor = .naranja3
         headerCiudadLabel.font = UIFont.bodyFont
-        headerCiudadLabel.text = ubicacion
-        headerCiudadLabel.backgroundColor = .red
+        headerCiudadLabel.text = ubicacion?.uppercased()
         
         headerLabel.text = self.tableView(self.tableView, titleForHeaderInSection: section)
         headerLabel.textAlignment = .left
@@ -283,7 +281,7 @@ class MainTableVC: UITableViewController, CLLocationManagerDelegate {
                 ahoraCell.setupAhoraCell(descripcion: "\(String(describing: climaActual!.current.weather.first!.weatherDescription.rawValue.uppercased()))",
                                         temperatura: "\(String(format: "%.0f", climaActual!.current.temp as! CVarArg))°",
                                         sensacion: "/ ST \(String(format: "%.0f", (climaActual?.current.feelsLike)! as CVarArg))°",
-                                        humedad:"Humedad: \(String(describing: climaActual!.current.humidity))%")
+                                        humedad:"Humedad: \(String(describing: climaActual!.current.humidity)) %")
             }
             return ahoraCell
             
@@ -293,11 +291,11 @@ class MainTableVC: UITableViewController, CLLocationManagerDelegate {
             if climaActual != nil {
                 
                 let calculoHsSiguientes = self.calcularHsSiguientes(horaActual: Double(climaActual!.current.dt))
-                despuesCell.setupDespuesCell(cuatroHs: "\(String(describing: calculoHsSiguientes[0])) hs.",
-                    cuatroHsTemperatura: "\(String(format: "%.0f", climaActual!.hourly[3].temp))°",
-                    ochoHs:  "\(String(describing: calculoHsSiguientes[1])) hs.",
+                despuesCell.setupDespuesCell(cuatroHs: "A las \(String(describing: calculoHsSiguientes[0])) hs.",
+                    cuatroHsTemperatura: "\(String(format: "%.0f", climaActual!.hourly[4].temp))°", cuatroHsIcon: climaActual!.hourly[3].weather.first!.icon,
+                    ochoHs:  "A las \(String(describing: calculoHsSiguientes[1])) hs.",
                     ochoHsTemperatura: "\(String(format: "%.0f", climaActual!.hourly[7].temp))°",
-                    doceHs:  "\(String(describing: calculoHsSiguientes[2])) hs.",
+                    doceHs:  "A las \(String(describing: calculoHsSiguientes[2])) hs.",
                     doceHsTemperatura: "\(String(format: "%.0f", climaActual!.hourly[11].temp))°")
             }
             return despuesCell
@@ -306,7 +304,7 @@ class MainTableVC: UITableViewController, CLLocationManagerDelegate {
             let semanaCell = tableView.dequeueReusableCell(withIdentifier: "SemanaCell", for: indexPath) as! SemanaCell
             if climaActual != nil {
                 let calculoDiasSiguientes = self.calcularDiasSiguientes(horaActual: Double(climaActual!.current.dt))
-                
+            //obtener nombre y numero de dia segun indexpath
                 let dateFormatter = DateFormatter()
                 dateFormatter.dateFormat = "cccc"
                 dateFormatter.locale = Locale(identifier: "es_AR")
@@ -315,9 +313,7 @@ class MainTableVC: UITableViewController, CLLocationManagerDelegate {
                 calendar.timeZone = TimeZone(identifier: "GMT-3")!
                 let diaNumero = calendar.component(.day, from: calculoDiasSiguientes[indexPath.row])
 
-
-                semanaCell.setupSemanaCell(dia: "\(diaNombre.capitalized) \(diaNumero)", temperatura: "\(String(format: "%.0f", climaActual!.hourly[3].temp))°")
-
+                semanaCell.setupSemanaCell(dia: "\(diaNombre.capitalized) \(diaNumero)", temperatura: "\(String(format: "%.0f", climaActual!.daily[indexPath.row].temp.min))° / \(String(format: "%.0f", climaActual!.daily[indexPath.row].temp.max))°")
                 
             }
             return semanaCell
